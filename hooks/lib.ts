@@ -125,3 +125,28 @@ export const breakdownOf = (
   ),
   memoryFiles: groupBy(raw.memoryFiles.map(file => ({ key: file.path, tokens: file.tokens }))),
 })
+
+export const DOT: Record<Level, string> = { low: '🟢', medium: '🟡', high: '🔴' }
+
+/** Surfaces that draw the band above the prompt; the others get the status line. */
+export const BAND_SURFACES: readonly string[] = ['terminal', 'desktop']
+
+/** One plain line for surfaces without the band: "🟢 Context 20% · 🟡 5h limit 50% (resets in 2h 05m)". */
+export const statusLine = (snapshot: Snapshot, now: number): string | undefined => {
+  const parts: string[] = []
+
+  if (snapshot.contextPercent !== undefined) {
+    const high = isHigh(snapshot.contextPercent) ? ' – consider /compact or /clear' : ''
+    parts.push(`${DOT[levelOf(snapshot.contextPercent)]} Context ${formatPercent(snapshot.contextPercent)}${high}`)
+  }
+
+  if (snapshot.fiveHour) {
+    const reset = resetsIn(snapshot.fiveHour, now)
+    parts.push(
+      `${DOT[levelOf(snapshot.fiveHour.percent)]} 5h limit ${formatPercent(snapshot.fiveHour.percent)}` +
+        (reset ? ` (resets in ${reset})` : ''),
+    )
+  }
+
+  return parts.length > 0 ? parts.join('  ·  ') : undefined
+}

@@ -3,6 +3,7 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { Breakdown, Limit, Snapshot, Warned } from '../types'
 import {
+  BAND_SURFACES,
   COLOR,
   bar,
   breakdownOf,
@@ -13,6 +14,7 @@ import {
   levelOf,
   resetsIn,
   snapshotOf,
+  statusLine,
 } from './lib'
 
 const PANE = 'usage-bar'
@@ -42,6 +44,22 @@ const measureBreakdown = async ($: EngineInterface, detail: 'summary' | 'full') 
     $.ui.toast('Could not measure the context breakdown.')
   } finally {
     await update($, isCounting, () => false)
+  }
+}
+
+/**
+ * VS Code and the mobile app draw no band above the prompt, so the figures go
+ * to the status line there; terminal and desktop keep the band alone.
+ */
+const refreshStatus = async ($: EngineInterface) => {
+  try {
+    const surfaces = await $.session.surfaces()
+    const current = await read($, snapshot)
+    const needsLine = surfaces.some(surface => !BAND_SURFACES.includes(surface))
+
+    $.ui.status(needsLine && current ? statusLine(current, await $.clock.now()) : undefined)
+  } catch {
+    // The band still shows where the surface draws one.
   }
 }
 
@@ -81,13 +99,30 @@ export const register: Register = on => {
       // The first session.measure fills the bar instead.
     }
 
+    await refreshStatus($)
+
     return next(e)
   })
 
   on('session.measure', async ($, e, next) => {
     await record($, snapshotOf(e))
+    await refreshStatus($)
 
     return next(e)
+  })
+
+  on('session.attach', async ($, e, next) => {
+    const attached = await next(e)
+    await refreshStatus($)
+
+    return attached
+  })
+
+  on('session.detach', async ($, e, next) => {
+    const detached = await next(e)
+    await refreshStatus($)
+
+    return detached
   })
 
   on('command.run', { command: COMMAND }, async $ => {

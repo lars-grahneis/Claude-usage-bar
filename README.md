@@ -18,6 +18,7 @@ Context  ████████████░░░░░░░░░░░�
 - **Bar above the prompt**: context window fill (tokens used / window size) and the 5-hour usage limit with time to reset. The 7-day limit is shown as a small figure beside it.
 - **Context above 2/3**: a one-time toast, and a row with `[ Compact ]` (runs `/compact`), `[ Clear ]` (puts `/clear` in the prompt box, Enter confirms) and `[ Details ]`. Nothing runs on its own.
 - **5-hour limit above 2/3**: a one-time toast with the time to reset.
+- **VS Code and the Claude mobile app**: these do not draw the band above the prompt, so the same figures appear as a status line with colored dots (🟢 🟡 🔴), e.g. `🔴 Context 70% – consider /compact or /clear  ·  🟡 5h limit 40% (resets in 2h 05m)`.
 - **`/usage-bar`**: opens a pane with what fills the context, in the categories `/context` uses (system prompt, tools, MCP tools, memory files, messages, free space, autocompact buffer), plus tokens per MCP server and per memory file.
   - Default is an **estimate** (`summary`), computed locally, no extra requests.
   - **`[ Exact count (uses API) ]`** counts each category with the token-counting API, as `/context` does. This sends one extra request per tool and memory file, which may count toward your usage limits.
@@ -31,6 +32,7 @@ Warnings re-arm once the value drops below 2/3 again (after a compaction, `/clea
 - The limits appear after the first response of a session.
 - Images are not a separate category; they count under *Messages*, as in `/context`.
 - Claude Code only. It does not touch claude.ai or the Claude desktop chat.
+- The mod loads where Claude Code reads your user settings. VS Code connected to WSL runs Claude Code inside WSL, so install it there as well.
 
 ## Install
 
