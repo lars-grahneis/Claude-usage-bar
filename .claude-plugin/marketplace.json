@@ -1,0 +1,6 @@
+{
+  "name": "claude-usage-bar",
+  "owner": { "name": "Lars Grahneis" },
+  "description": "Context window and usage limit bar for Claude Code",
+  "plugins": [{ "name": "usage-bar", "source": "./" }]
+}
