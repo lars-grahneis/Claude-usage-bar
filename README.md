@@ -34,6 +34,19 @@ Warnings re-arm once the value drops below 2/3 again (after a compaction, `/clea
 - Claude Code only. It does not touch claude.ai or the Claude desktop chat.
 - The mod loads where Claude Code reads your user settings. VS Code connected to WSL runs Claude Code inside WSL, so install it there as well.
 
+## Tested on
+
+Tested with Claude Code 2.1.296 on Windows 11 and WSL2 (Ubuntu), October 2026.
+
+| Where | Bar / status line | `/usage-bar` |
+| --- | --- | --- |
+| Windows Terminal (PowerShell) | bar above the prompt | yes |
+| WSL terminal | bar above the prompt | yes |
+| Claude Desktop app, local Code session | bar above the prompt | yes |
+| VS Code, Claude panel (Windows and WSL) | status line | yes |
+| VS Code, integrated terminal | not shown | yes |
+| Cloud sessions (claude.ai/code, app "cloud") | not loaded: they run on a server without your plugins | no |
+
 ## Install
 
 In a Claude Code terminal session:
@@ -42,7 +55,30 @@ In a Claude Code terminal session:
 /plugin install usage-bar --marketplace lars-grahneis/Claude-usage-bar
 ```
 
-Answer `y` to add the marketplace, then choose the scope (user scope loads it in every session).
+Answer `y` to add the marketplace, then choose the scope (user scope loads it in every session). Restart Claude Code afterwards.
+
+Or from a shell (PowerShell, bash), outside Claude Code:
+
+```
+claude plugin marketplace add lars-grahneis/Claude-usage-bar
+claude plugin install usage-bar@claude-usage-bar
+```
+
+Install it once per environment: Windows and WSL keep separate settings. The Claude Desktop app's local sessions use the Windows installation.
+
+## Update
+
+```
+claude plugin marketplace update claude-usage-bar
+claude plugin update usage-bar@claude-usage-bar
+```
+
+Then restart Claude Code (in VS Code: *Developer: Reload Window*). If that does not pick up the new version, uninstall and install again:
+
+```
+claude plugin uninstall usage-bar@claude-usage-bar
+claude plugin install usage-bar@claude-usage-bar
+```
 
 ## Development
 
